@@ -89,11 +89,11 @@ public class BasicNetwork implements Network {
             try {
                 // Gather headers.
                 Map<String, String> headers = new HashMap<String, String>();
-                addCacheHeaders(headers, request.getCacheEntry());
+                addCacheHeaders(headers, request.getCacheEntry());             
                 httpResponse = mHttpStack.performRequest(request, headers);
                 StatusLine statusLine = httpResponse.getStatusLine();
                 int statusCode = statusLine.getStatusCode();
-
+                
                 responseHeaders = convertHeaders(httpResponse.getAllHeaders());
                 // Handle cache validation.
                 if (statusCode == HttpStatus.SC_NOT_MODIFIED) {
@@ -188,7 +188,11 @@ public class BasicNetwork implements Network {
 
         if (entry.serverDate > 0) {
             Date refTime = new Date(entry.serverDate);
-            headers.put("If-Modified-Since", DateUtils.formatDate(refTime));
+            String refTimeString = DateUtils.formatDate(refTime);
+            if (refTimeString.endsWith("GMT+00:00")) {
+            	refTimeString = refTimeString.substring(0, refTimeString.length() - 6);
+            }
+            headers.put("If-Modified-Since", refTimeString);
         }
     }
 
